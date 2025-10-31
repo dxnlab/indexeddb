@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "esnext", // Or your desired target environment
+    "module": "esnext", // Or your desired module system (e.g., "commonjs")
+    "moduleResolution": "node",
+    "declaration": true, // Generate declaration files (.d.ts)
+    "outDir": "./dist", // Output directory for compiled JS and d.ts files
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.ts"] // Include your source files
+}
