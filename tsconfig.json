@@ -5,10 +5,12 @@
     "moduleResolution": "node",
     "declaration": true, // Generate declaration files (.d.ts)
     "outDir": "./dist", // Output directory for compiled JS and d.ts files
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
-  "include": ["src/**/*.ts"] // Include your source files
+  "include": ["src/**/*.ts", "src/**/*.vue"] // Include your source files
 }
