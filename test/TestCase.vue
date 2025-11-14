@@ -1,10 +1,7 @@
 <template>
   <v-list-item :title="$props.title" :subtitle="$props?.desc" :key="`${index}-${refresh}`">
     <template #prepend>
-      <v-icon v-if="status=='success'" color="green">mdi-check-circle</v-icon>
-      <v-icon v-else-if="status=='error'" color="red">mdi-alert-circle</v-icon>
-      <v-icon v-else-if="status=='running'" color="blue">mdi-progress-clock</v-icon>
-      <v-icon v-else color="grey">mdi-checkbox-blank-circle-outline</v-icon>
+      <StatusIcon :status="status" />
     </template>
     <template #append>
       <v-btn icon flat @click="$emit('update:modelValue', true)" :disabled="$props.modelValue">
@@ -16,18 +13,20 @@
 
 <script setup lang="ts">
 import { reactive, ref, shallowReactive, watch } from 'vue';
-import { TestCase } from './unittest.ts';
+import { TestCase, TestSemaphore } from './unittest.ts';
+import StatusIcon from './StatusIcon.vue';
 
 const $props = defineProps({
-  index: { type: Number, required: true },
-  test: { type: Function as ()=>Promise<void>|void, required: true },
+  index: { type: String, required: true },
+  test: { type: Function, required: true },
   title: { type: String, required: false },
   desc: { type: String, required: false },
-  setup: { type: Function as ()=>Promise<void>|void, required: false },
-  teardown: { type: Function as ()=>Promise<void>|void, required: false },
+  setup: { type: Function, required: false },
+  teardown: { type: Function, required: false },
   timeout: { type: Number, required: false, default: 5000 },
-  dataset: { type: Function as ()=>AsyncGenerator<[], void, void> | Promise<Array<[]>> | Array<[]>, required: false },
+  dataset: { type: Function, required: false },
   modelValue: { type: Boolean, required: false, default: false },
+  workers: { type: Object as ()=>TestSemaphore, default: undefined },
 });
 
 const testcase = new TestCase($props.test, {
@@ -40,6 +39,7 @@ const testcase = new TestCase($props.test, {
 });
 const $emits = defineEmits([
   'update:status',
+  'update:assigned',
   'update:modelValue',
 ]);
 const status = ref('ready');
@@ -48,15 +48,14 @@ const refresh = ref(Date.now());
 const result = reactive({
   error: unittest.error || null,
   passed: unittest.passed || 0,
-  logs: unittest.logs || [],
-  elapsed: unittest.elapsed || 0,
+  logs: unittest?.logs || [],
+  elapsed: unittest?.elapsed || 0,
 });
 testcase.addEventListener(TestCase.updateStatusEvent, (ev)=>{
-  $emits('update:status', ev.status);
-  status.value = ev.status;
-  console.log($props.index, 'status updated', ev.status, Date.now());
+  $emits('update:status', ev.status!);
+  status.value = ev.status!;
   
-  if(unittest.settled) {
+  if(ev.settled!) {
     result.error = unittest.error;
     result.passed = unittest.passed;
     result.logs = unittest.logs;
@@ -71,10 +70,9 @@ watch(()=>$props.modelValue, (newValue, oldValue)=>{
   } 
 });
 
-function startTest() {
-  console.log($props.index, 'test started', Date.now());
+async function startTest() {
   if(!unittest.isBusy) {
-    unittest.run();
+    await unittest.run($props.workers);
   } else {
     $emits('update:modelValue', false);
   }

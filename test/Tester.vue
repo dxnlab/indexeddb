@@ -9,21 +9,25 @@
         </v-icon>
       </v-btn>
     </v-app-bar>
-    <v-progress-linear :value="progress" height="4"></v-progress-linear>
+    <v-progress-linear :value="progress" height="4" color="primary" />
     <v-main>
       <v-container fluid>
         <v-row>
           <!-- unit tests area -->
           <v-col cols="12" md="6" lg="4" xl="3">
             <v-list two-line>
-              <TestCase v-for="(unit, idx) in $props.cases" :key="idx" :index="idx" 
-                v-bind="unit"
+              <test-group v-for="(suite, idx) in testSuites" 
+                :key="`testsuite-${idx}`" 
+                :group="suite.id" 
+                :workers="TestCase.Workers"
+                v-bind="suite"
                 v-model="runners[idx]"
               />
             </v-list>
           </v-col>
           <!-- test report area -->
           <v-col cols="12" md="6" lg="8" xl="9">
+            <!-- TODO: show logs & errors -->
           </v-col>
         </v-row>
       </v-container>
@@ -34,14 +38,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { run } from './utils'
-import envTests from './envs.ts'
-import TestCase from './TestCase.vue'
+import suites from './cases/index.ts'
+import { TestCase } from './unittest.ts'
+import TestGroup from './TestGroup.vue'
 
-const $props = defineProps({
-  cases: { type: Array as ()=>any[], default:()=>envTests },
-});
-
-const runners = ref($props.cases.map(()=>false));
+const testSuites = ref(suites);
+const runners = ref(testSuites.value.map(()=>false));
 const progress = ref(0);
 
 </script>

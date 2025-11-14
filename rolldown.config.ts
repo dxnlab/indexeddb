@@ -18,7 +18,15 @@ export default defineConfig([
       file: 'dist/idb.cjs',
       format: 'commonjs',
       esModule: true,
-      
     }
   },
+  /** sample for test  */
+  {
+    input: 'src/sample.ts',
+    output: {
+      file: 'dist/sample.js',
+      format: 'esm',
+      minify: false,
+    }
+  }
 ]);

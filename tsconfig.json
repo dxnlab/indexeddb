@@ -1,16 +1,18 @@
 {
   "compilerOptions": {
-    "target": "esnext", // Or your desired target environment
-    "module": "esnext", // Or your desired module system (e.g., "commonjs")
-    "moduleResolution": "node",
-    "declaration": true, // Generate declaration files (.d.ts)
-    "outDir": "./dist", // Output directory for compiled JS and d.ts files
-    "strict": false,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true
+    "target": "es6", // Or your desired target environment
+    // "module": "ES6", // Or your desired module system (e.g., "commonjs")
+    // "moduleResolution": "node",
+    // "declaration": true, // Generate declaration files (.d.ts)
+    // "outDir": "./dist", // Output directory for compiled JS and d.ts files
+    // "strict": false,
+    // "esModuleInterop": true,
+    // "skipLibCheck": true,
+    // "forceConsistentCasingInFileNames": true,
+    // "noEmit": true,
+    // "allowImportingTsExtensions": true
+    "experimentalDecorators": true,
+    "useDefineForClassFields": true,
   },
   "include": ["src/**/*.ts", "src/**/*.vue"] // Include your source files
 }

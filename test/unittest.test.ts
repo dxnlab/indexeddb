@@ -21,18 +21,22 @@ describe('test testcase', ()=>{
       this.assert(false, 'should fail');
     });
     assert.equal(failTest.status, 'ready');
-    await failTest.run().catch(()=>{
+    await failTest.run()
+    .then(()=>{ 
+      assert.fail('should not be here'); 
+    })
+    .catch(()=>{
       assert.equal(failTest.status, 'error');
       assert.equal(failTest.error?.message, 'should fail');
       assert.equal(failTest.passed, 1);
-      assert.equal(failTest.getLogs(), []);
+      assert.deepEqual(failTest.getLogs(), []);
     });
   });
 
   it('with setup/teardown', async()=>{ 
     let setupDone = false;
-    const test = new TestCase(function(){
-      this.assert(setupDone, 'setup was not called');
+    const test = new TestCase(async function(){
+      await this.assert(setupDone, 'setup was not called');
     }, {
       setup: () => new Promise((rs)=>{
         setTimeout(()=>{
@@ -72,8 +76,8 @@ describe('test testcase', ()=>{
     let actual = 0;
 
     const datasetTest = new TestCase(async function(num:number, sub?:boolean=false){
-      this.assert(0<num, 'parameter on');
-      this.assert(sub === false, 'sub parameter off');
+      await this.assert(0<num, 'parameter on');
+      await this.assert(sub === false, 'sub parameter off');
       actual += num;
     }, {
       dataset: async function*() {
