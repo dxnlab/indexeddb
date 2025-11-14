@@ -1,4 +1,3 @@
-import { assert } from '@std/assert';
 import type { 
   IDBFactory, 
   IDBDatabase,
@@ -35,9 +34,15 @@ export class Factory {
     const idb = (globalThis as any)?.indexedDB 
     || (globalThis as any)?.mozIndexedDB 
     || (globalThis as any)?.webkitIndexedDB 
-    || (globalThis as any)?.msIndexedDB
-    ;assert(idb, 'IndexedDB is not supported in this environment');
+    || (globalThis as any)?.msIndexedDB;
+    if(!idb) {
+      throw new Error('indexeddb not supported');
+    }
     return idb;
+  }
+
+  static get databases():Promise<IDBDatabase[]> {
+    return promising(Factory.factory.databases);
   }
 
   protected connector:Promise<IDBDatabase> | null = null;
@@ -69,7 +74,7 @@ export class Factory {
     const builder = ((db:IDBFactory)=>db.open(this.dbname, this.migration?.version));
     const handler = promising(builder, {
       // triggers
-      onupgradeneeded: this.migration?.upgrade || this.onUpgrade,
+      onupgradeneeded: this.migration?.upgrade || this.onUpgrade.bind(this),
       onblocked: this.migration?.blocked,
       onabort: this.migration?.abort,
       onerror: this.migration?.error,
@@ -97,6 +102,7 @@ export class Factory {
 
   onUpgrade({target}:{target:any}) {
     const db:IDBDatabase = target.result;
+    console.log('on upgrade called', this);
     
     Object.entries(this?.migration?.stores || {})
       .forEach(([storeName, storeDef])=>{
@@ -122,8 +128,8 @@ export class Factory {
     options?:IDBTransactionOptions
   ) {
     const asyncDB = this.connector;
-    return function(asyncFx:Function) {
-      return async function(this:any, ...args:any[]) {
+    return function(asyncFx) {
+      return async function(this, ...args) {
         try {
           const idb = await asyncDB;
           const tx = idb.transaction(storeNames, mode, options);

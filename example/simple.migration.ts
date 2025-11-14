@@ -44,8 +44,7 @@ export default {
   }
 
   /** (optional) if "upgrade" exists, 
-   * it will be called prior 
-   * and "stores" be ignored.
+   * it will be overrides then "stores" built.
    **/
   // upgrade(db: IDBDatabase) { ... },
 

@@ -3,11 +3,12 @@ export function promising(
   triggers:{[on:string]:Function|null|undefined}={}, 
   self?:any) {
   return (...args:any[])=>new Promise((ok,err)=>{
+    // @ts-ignore: intended call
     const request = builder.apply(self, args);
     Object.entries({
       ...triggers,
-      onsuccess: ({result}: {result:any})=>ok(result),
-      onerror: ({error}: {error:any})=>err(error),
+      onsuccess: ({target,result})=>ok(result || target.result),
+      onerror: ({target,error})=>err(error || target.error),
     })
       .filter(([,listener])=>listener!=null)
       .forEach(([event, listener])=>{

@@ -23,7 +23,7 @@ export type IDBDatabaseInfo = {
 
 export type IDBDatabase = IDBDatabaseInfo & {
   objectStoreNames: DOMStringList;
-  close(name:string): void;
+  close(): undefined;
   createObjectStore(name:string, options?:IDBObjectStoreInfo): IDBObjectStore;
   deleteObjectStore(name:string): void;
   transaction(storeNames:strings, mode?:IDBTransactionMode, options?:IDBTransactionOptions): IDBTransaction;
