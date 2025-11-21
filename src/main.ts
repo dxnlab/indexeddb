@@ -25,9 +25,9 @@ export function withTx(
   options?:IDBTransactionOptions) {
   return function(origin) {
     return async function(this, ...args) {
-      const idb = await this._idb;
-      const wrapTx = idb.transaction(storeNames, mode, options);
-      return await wrapTx(origin).apply(this, args);
+      const factory = await this.__idb_factory;
+      const wrap = factory.transaction(storeNames, mode, options);
+      return await (wrap(origin).apply(this, args));
     }
   }
 }

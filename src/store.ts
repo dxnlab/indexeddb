@@ -1,10 +1,12 @@
-import type { IDBObjectStore } from './types.js';
+import type { IDBObjectStore } from './types.ts';
 import { promising } from "./utils.ts";
 
 export function wrapStore(store:IDBObjectStore) {
   return new Proxy(store, {
     get(store:IDBObjectStore, prop:string, receiver:any) {
       switch(prop) {
+        case '__store':
+          return store;
         case 'name':
         case 'indexNames':
         case 'transaction': 

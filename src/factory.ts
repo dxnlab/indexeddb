@@ -4,6 +4,7 @@ import type {
   IDBTransactionOptions,
   IDBTransactionMode,
 } from "./types.ts";
+import { wrapTx } from "./transaction.ts";
 import { promising } from './utils.ts';
 
 export type IDBMigration = {
@@ -55,10 +56,14 @@ export class Factory {
     // (optional) indexedDB migration option
     protected migration?:IDBMigration,
     // (optional) keyname to store on target class
-    protected keyname:string='_idb'
+    public readonly keyname:string='_idb'
   ) {
     Object.defineProperty(target, keyname, {
       get: ()=>this.db,
+    });
+    // debugging
+    Object.defineProperty(target, '__idb_factory', {
+      get: ()=>this,
     });
   }
 
@@ -130,16 +135,20 @@ export class Factory {
     const asyncDB = this.connector;
     return function(asyncFx) {
       return async function(this, ...args) {
+        let tx = null;
         try {
           const idb = await asyncDB;
-          const tx = idb.transaction(storeNames, mode, options);
+          tx = wrapTx(idb.transaction(storeNames, mode, options));
           const rss = await asyncFx.apply(this, [tx, ...args]);
           if(mode!=='readonly') {
-            tx.commit();
+            tx.__tx.commit();
           }
           return rss;
         } catch(ex) {
-          tx.abort();
+          if(tx && tx!=null) {
+            console.log('?illegal?', ex, tx.__tx)
+            tx.__tx.abort();
+          }
           throw ex;
         }
       }

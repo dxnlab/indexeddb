@@ -1,7 +1,7 @@
 import { promising } from '../../src/utils.ts'
 
 export default [
-  {
+  { /* 단위 테스트 유효성 검증 */
     title: 'Test unit test passes',
     desc: 'Testing unit test passes the assertion',
     test: function() {
@@ -9,7 +9,7 @@ export default [
 
     }
   },
-  { /* dataset provided */
+  { /* 단위 테스트 유효성 검증 - 데이터세트 */
     title: 'dataset should pass',
     desc: 'A test case that uses dataset to run multiple assertions',
     dataset: (async function*() {
@@ -21,7 +21,7 @@ export default [
       this.assert!(num > 0, `Number ${num} should be greater than 0`);
     }
   },
-  { /* has indexedDB */
+  { /* IndexedDB 지원 여부 확인 */
     title: 'IndexedDB availability',
     desc: 'Check if IndexedDB is available in the environment',
     test: function(){
@@ -33,7 +33,7 @@ export default [
       }
     }
   },
-  { /* utility promising */
+  { /* promising 유틸리티 테스트 */
     title: 'Promising test',
     test: async function() {
       const idb = globalThis.indexedDB;
@@ -50,5 +50,6 @@ export default [
         await globalThis.indexedDB.deleteDatabase('novice'));
     }
 
-  }
+  },
+
 ];

@@ -21,12 +21,12 @@ export default defineConfig([
     }
   },
   /** sample for test  */
-  {
-    input: 'src/sample.ts',
-    output: {
-      file: 'dist/sample.js',
-      format: 'esm',
-      minify: false,
-    }
-  }
+  // {
+  //   input: 'src/sample.ts',
+  //   output: {
+  //     file: 'dist/sample.js',
+  //     format: 'esm',
+  //     minify: false,
+  //   }
+  // }
 ]);

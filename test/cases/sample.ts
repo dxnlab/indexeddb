@@ -1,4 +1,4 @@
-import { idb, reads, writes } from "./main.ts";
+import { idb, reads, writes } from "../../src/main.ts";
 
 export type Item = {
   id: string;
@@ -34,6 +34,9 @@ class IDBSample {
 
   @reads('items')
   async listItems(tx, condition?:IDBKeyRange, count?:number):Promise<Item[]> {
+    console.log('listItems', {
+      tx, condition, count,
+    })
     return await tx.items.getAll(condition, count);
   }
 
