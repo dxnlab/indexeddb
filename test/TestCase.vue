@@ -8,11 +8,26 @@
         <v-icon>mdi-play-circle-outline</v-icon>
       </v-btn>
     </template>
+    <v-tooltip v-if="settled" activator="parent">
+      <v-alert color="info">
+        <span>
+          {{  result?.passed }} passed {{ status }} by {{  result?.elapsed }}ms
+        </span>
+        <div v-if="result?.logs && result.logs.length > 0">
+          {{  (result?.logs || []).map(JSON.stringify).join('\n') }}
+        </div>
+      </v-alert>
+      
+      <v-alert v-if="result?.error" color="error" >
+        {{  result?.error }}
+      </v-alert>
+
+    </v-tooltip>
   </v-list-item>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, shallowReactive, watch } from 'vue';
+import { ref, shallowReactive, watch } from 'vue';
 import { TestCase, TestSemaphore } from './unittest.ts';
 import StatusIcon from './StatusIcon.vue';
 
@@ -45,21 +60,26 @@ const $emits = defineEmits([
 const status = ref('ready');
 const unittest = shallowReactive(testcase);
 const refresh = ref(Date.now());
-const result = reactive({
+const settled = ref(false);
+let result = shallowReactive({
   error: unittest.error || null,
   passed: unittest.passed || 0,
   logs: unittest?.logs || [],
   elapsed: unittest?.elapsed || 0,
 });
 testcase.addEventListener(TestCase.updateStatusEvent, (ev)=>{
+  console.log(testcase.title, 'status update:', ev.status);
   $emits('update:status', ev.status!);
   status.value = ev.status!;
   
+  settled.value = ev.settled;
   if(ev.settled!) {
-    result.error = unittest.error;
-    result.passed = unittest.passed;
-    result.logs = unittest.logs;
-    result.elapsed = unittest.elapsed;
+    result = {
+      error: unittest.error,
+      passed: unittest.passed,
+      logs: unittest.logs,
+      elapsed: unittest.elapsed,
+    };
     $emits('update:modelValue', false);
   }
 });

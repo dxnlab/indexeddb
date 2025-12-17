@@ -204,7 +204,7 @@ export class TestCase extends EventTarget {
   }
 
   protected setStatus(status:TestStatus, options:object={}) {
-    console.log(`status: ${status}`, options);
+    // console.log(`status: ${status}`, options);
     this._status = status;
     this.emit(TestCase.updateStatusEvent, {
       status,
